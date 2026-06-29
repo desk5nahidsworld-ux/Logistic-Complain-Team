@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+venv/
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Uploads
+uploads/
+images/
+
+# Database
+*.db
+*.sqlite
