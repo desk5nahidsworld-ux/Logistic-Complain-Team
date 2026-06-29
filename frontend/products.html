@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রোডাক্ট - Logistic Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-cube"></i> Logistic Management
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">হোম</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="products.html">প্রোডাক্ট</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="orders.html">অর্ডার</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">লগআউট</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2>প্রোডাক্ট ম্যানেজমেন্ট</h2>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
+                    <i class="fas fa-plus"></i> নতুন প্রোডাক্ট
+                </button>
+            </div>
+        </div>
+
+        <!-- Products List -->
+        <div id="productsList" class="row"></div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">নতুন প্রোডাক্ট যোগ করুন</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <div class="mb-3">
+                            <label class="form-label">প্রোডাক্ট নাম</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">SKU</label>
+                            <input type="text" class="form-control" id="productSku" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">বিবরণ</label>
+                            <textarea class="form-control" id="productDesc" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">মূল্য</label>
+                            <input type="number" class="form-control" id="productPrice" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">পরিমাণ</label>
+                            <input type="number" class="form-control" id="productQty" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ক্যাটাগরি</label>
+                            <input type="text" class="form-control" id="productCat" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ছবি</label>
+                            <input type="file" class="form-control" id="productImages" multiple accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">যোগ করুন</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Load Products
+        async function loadProducts() {
+            const result = await apiCall('/products/all');
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            if (result.success) {
+                result.data.forEach(product => {
+                    const card = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product.name}</h5>
+                                    <p class="card-text"><strong>SKU:</strong> ${product.sku}</p>
+                                    <p class="card-text"><strong>মূল্য:</strong> ৳${product.price}</p>
+                                    <p class="card-text"><strong>পরিমাণ:</strong> ${product.quantity}</p>
+                                    <p class="card-text"><small>${product.description}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productsList.innerHTML += card;
+                });
+            }
+        }
+
+        // Add Product
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!isAuthenticated()) {
+                showToast('❌ আপনাকে প্রথমে লগইন করতে হবে', 'warning');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Note: File upload requires FormData and multipart/form-data
+            showToast('✅ প্রোডাক্ট যোগ করার সুবিধা শীঘ্রই আসছে', 'info');
+            document.getElementById('productForm').reset();
+        });
+
+        loadProducts();
+    </script>
+</body>
+</html>
